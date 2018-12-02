@@ -1,4 +1,4 @@
-const DB = require('./../../../models/sequelize');
+const DB = require('./../../models/sequelize');
 const User = DB['User'];
 const Op = DB.Sequelize.Op;
 
@@ -11,7 +11,7 @@ const all = async (req, res, next) => {
         })
         .catch(error => {
             res.app.emit('response', res, {
-                code: 502,
+                code: 503,
                 messages: error.errors || error.original
             });
         });
@@ -34,7 +34,7 @@ const create = async (req, res, next) => {
         })
         .catch(error => {
             res.app.emit('response', res, {
-                code: 502,
+                code: 503,
                 messages: error.errors || error.original
             });
         });
@@ -49,7 +49,7 @@ const retrieve = async (req, res, next) => {
         })
         .catch(error => {
             res.app.emit('response', res, {
-                code: 502,
+                code: 503,
                 messages: error.errors
             });
         });
@@ -90,14 +90,14 @@ const update = async (req, res, next) => {
                 })
                 .catch(error => {
                     res.app.emit('response', res, {
-                        code: 502,
+                        code: 503,
                         messages: error.errors
                     });
                 });
         })
         .catch(error => {
             res.app.emit('response', res, {
-                code: 502,
+                code: 503,
                 messages: error.errors
             });
         });

@@ -48,6 +48,29 @@ Object.keys(db).forEach(modelName => {
     }
 });
 
+sequelize
+    .authenticate()
+    .then(() => {
+        console.log(
+            'Connection to ',
+            process.env.DB_URANUS_DB,
+            '@',
+            process.env.DB_URANUS_HOST,
+            ' has been established successfully.'
+        );
+    })
+    .catch(err => {
+        console.error(
+            'Connection to',
+            process.env.DB_URANUS_DB + '@' + process.env.DB_URANUS_HOST,
+            'Unable to connect, error info',
+            err.original.sqlMessage
+        );
+        console.log(
+            '--------------------- Please check env config again!!!! ---------------------'
+        );
+    });
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 

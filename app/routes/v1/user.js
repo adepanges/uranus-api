@@ -1,4 +1,4 @@
-const userController = require('../../controllers/api/v1/user');
+const userController = require('../../controllers/v1/user');
 const wrap = require('../../helpers/wrap_async');
 
 const router = require('express').Router();

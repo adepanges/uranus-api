@@ -1,4 +1,4 @@
-const jokeController = require('../../controllers/api/v1/joke');
+const jokeController = require('../../controllers/v1/joke');
 const wrap = require('../../helpers/wrap_async');
 
 const router = require('express').Router();
