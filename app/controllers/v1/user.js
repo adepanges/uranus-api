@@ -1,62 +1,38 @@
-const DB = require('./../../models/sequelize');
-const User = DB['User'];
-const Op = DB.Sequelize.Op;
+const userRepository = require('../../repositories/v1/user');
+const Op = userRepository.DB.Sequelize.Op;
 
-const all = async (req, res, next) => {
-    User.findAll()
-        .then(users => {
-            res.app.emit('response', res, {
-                users
-            });
-        })
-        .catch(error => {
-            res.app.emit('response', res, {
-                code: 503,
-                messages: error.errors || error.original
-            });
-        });
+const get = (req, res) => {
+    var params = {
+        attributes: [
+            'id',
+            'uuid',
+            'username',
+            'firstname',
+            'lastname',
+            'email'
+        ],
+        pagination: userRepository.generatePaginationParams(req)
+    };
+
+    userRepository.getAllWithPaging(params, res);
 };
 
-const create = async (req, res, next) => {
-    User.create({
+const create = (req, res) => {
+    var params = {
         username: req.body.username,
         password: req.body.password,
         email: req.body.email,
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         bio: req.body.bio,
-        birthday: req.body.birthday
-    })
-        .then(user => {
-            res.app.emit('response', res, {
-                user
-            });
-        })
-        .catch(error => {
-            res.app.emit('response', res, {
-                code: 503,
-                messages: error.errors || error.original
-            });
-        });
+        birthdate: req.body.birthdate
+    };
+
+    userRepository.createSingle(params, res);
 };
 
-const retrieve = async (req, res, next) => {
-    User.findById(req.params.userId)
-        .then(users => {
-            res.app.emit('response', res, {
-                users
-            });
-        })
-        .catch(error => {
-            res.app.emit('response', res, {
-                code: 503,
-                messages: error.errors
-            });
-        });
-};
-
-const update = async (req, res, next) => {
-    User.findOne({
+const destroy = (req, res) => {
+    var params = {
         where: {
             [Op.or]: [
                 {
@@ -67,45 +43,41 @@ const update = async (req, res, next) => {
                 }
             ]
         }
-    })
-        .then(user => {
-            if (user == null)
-                res.app.emit('response', res, {
-                    code: 401,
-                    messages: 'User Not Found'
-                });
+    };
 
-            user.update({
-                password: req.body.password || user.password,
-                email: req.body.email || user.email,
-                firstname: req.body.firstname || user.firstname,
-                lastname: req.body.lastname || user.lastname,
-                bio: req.body.bio || user.bio,
-                birthday: req.body.birthday || user.birthday
-            })
-                .then(() => {
-                    res.app.emit('response', res, {
-                        user
-                    });
-                })
-                .catch(error => {
-                    res.app.emit('response', res, {
-                        code: 503,
-                        messages: error.errors
-                    });
-                });
-        })
-        .catch(error => {
-            res.app.emit('response', res, {
-                code: 503,
-                messages: error.errors
-            });
-        });
+    userRepository.deleteSingle(params, res);
+};
+
+const update = (req, res) => {
+    var params = {
+        where: {
+            [Op.or]: [
+                {
+                    id: req.params.userId
+                },
+                {
+                    uuid: req.params.userId
+                }
+            ]
+        }
+    };
+
+    var input = {
+        username: req.body.username,
+        password: req.body.password,
+        email: req.body.email,
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        bio: req.body.bio,
+        birthdate: req.body.birthdate
+    };
+
+    userRepository.updateSingle(params, input, res);
 };
 
 module.exports = {
-    all,
+    get,
     create,
-    retrieve,
+    destroy,
     update
 };

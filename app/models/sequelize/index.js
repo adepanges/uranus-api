@@ -53,11 +53,10 @@ sequelize
     .then(() => {
         console.log(
             'Connection to ',
-            process.env.DB_URANUS_DB,
-            '@',
-            process.env.DB_URANUS_HOST,
+            process.env.DB_URANUS_DB + '@' + process.env.DB_URANUS_HOST,
             ' has been established successfully.'
         );
+        console.log('--------------------- OK, Fine ---------------------');
     })
     .catch(err => {
         console.error(

@@ -38,7 +38,7 @@ const attachHttpListeners = app => {
 
         res.status(meta.code).json({
             meta: meta,
-            data: res.locals.response || []
+            body: res.locals.response || []
         });
     });
 };
