@@ -37,7 +37,6 @@ function attachProcessMessagesSequelize(_this) {
                 res.app.emit('response', res, {
                     code: 503,
                     messages:
-                        error ||
                         errors.errors ||
                         errors.original.sqlMessage ||
                         errors.original
@@ -356,7 +355,7 @@ function baseRepository(modelInstance, modelName) {
             _this.modelName = modelName;
             _this.DB = DB;
             if (DB[modelName]) {
-                _this.model = DB[modelName];
+                _this.model = _this.DB[modelName];
             } else {
                 conssole.log('Schema', modelName, 'is not found in sequelize');
             }
