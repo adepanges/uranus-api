@@ -52,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
         return user;
     });
 
-    User.associate = function(models) {
+    User.associate = models => {
         // associations can be defined here
     };
 
