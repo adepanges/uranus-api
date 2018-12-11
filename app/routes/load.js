@@ -4,7 +4,6 @@ var routes = {
     v1: {
         instance: './v1/instance',
         module: './v1/module',
-        joke: './v1/joke',
         user: './v1/user'
     }
 };
