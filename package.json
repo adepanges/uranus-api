@@ -27,7 +27,7 @@
         "flat": "^4.1.0",
         "mysql2": "^1.6.1",
         "response-time": "^2.3.2",
-        "sequelize": "^4.41.0"
+        "sequelize": "^4.41.2"
     },
     "devDependencies": {
         "babel-core": "^6.26.3",

@@ -37,8 +37,30 @@ module.exports = (sequelize, DataTypes) => {
         }
     );
 
+    Module.includes = new Array();
     Module.associate = models => {
         // associations can be defined here
+
+        // ------- module channel -------
+        Module.hasMany(models.Module_channel, {
+            foreignKey: 'module_id',
+            as: 'channels'
+        });
+        Module.includes['channels'] = {
+            model: models.Module_channel,
+            availableAttributes: [
+                'id',
+                'module_id',
+                'domain',
+                'name',
+                'desc',
+                'created_at',
+                'updated_at',
+                'deleted_at'
+            ],
+            as: 'channels'
+        };
+        // ------- module channel -------
     };
 
     return Module;

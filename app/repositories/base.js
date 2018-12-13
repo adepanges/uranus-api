@@ -21,8 +21,11 @@ function attachProcessMessagesSequelize(_this) {
     _this.generateErrors = (errors, res, failed_cb) => {
         var sequelizeErrorName = [
             'SequelizeValidationError',
-            'SequelizeUniqueConstraintError'
+            'SequelizeUniqueConstraintError',
+            'SequelizeEagerLoadingError'
         ];
+
+        console.log(errors);
 
         if (
             sequelizeErrorName.indexOf(errors.name) >= 0 &&
@@ -61,6 +64,100 @@ function attachProcessMessagesSequelize(_this) {
             messages:
                 String(_this.modelName).toLocaleLowerCase() + ' is not found'
         });
+    };
+
+    return _this;
+}
+
+function attachProcessParams(_this) {
+    _this.generateRequestParams = req => {
+        var generatedParams = {
+            pagination: _this.generatePaginationParams(req)
+        };
+
+        var attributes = _this.generateAttributeRequest(req);
+        if (attributes.length > 0) generatedParams.attributes = attributes;
+
+        var includes = _this.generateIncludesRequest(req);
+        if (includes.length > 0) generatedParams.includes = includes;
+
+        return generatedParams;
+    };
+
+    _this.generateAttributeRequest = req => {
+        var attributesFiltered = new Array();
+
+        if (_this.availableAttributes.length > 0) {
+            if (req.query.attributes) {
+                var attributes = String(req.query.attributes).split(',');
+                if (attributes.length > 0) {
+                    attributes.forEach((item, key) => {
+                        if (
+                            _this.availableAttributes.indexOf(
+                                String(item).trim()
+                            ) > -1
+                        )
+                            attributesFiltered.push(String(item).trim());
+                    });
+                }
+            } else {
+                attributesFiltered = _this.availableAttributes;
+            }
+        }
+
+        return attributesFiltered;
+    };
+
+    _this.generateIncludesRequest = req => {
+        var includeFiltered = new Array();
+
+        if (req.query.includes) {
+            var queryIncludes = req.query.includes;
+
+            if (!Array.isArray(queryIncludes))
+                queryIncludes = String(queryIncludes).split(',');
+            // .forEach((row, key) => {
+            //     queryIncludes[row] = '';
+            // });
+
+            for (var key in queryIncludes) {
+                console.log(key);
+
+                var raw_attr = String(req.query.includes[key]).trim(),
+                    attr = raw_attr.split(','),
+                    includeModel = _this.model.includes[key];
+                includeModel.attributes = new Array();
+                var availableAttributes =
+                    includeModel.availableAttributes || new Array();
+                if (includeModel) {
+                    if (raw_attr != '') {
+                        attr.forEach((item, key) => {
+                            if (availableAttributes.indexOf(item) > -1) {
+                                includeModel.attributes.push(item);
+                            }
+                        });
+                    } else includeModel.attributes = availableAttributes;
+                    includeFiltered.push(includeModel);
+                }
+            }
+        }
+
+        return includeFiltered;
+    };
+
+    /*
+        author: Ade Pangestu (adepanges@gmail.com)
+        -------------------------------------
+        method generatePaginationParams: to generate params pagination send from req.query 
+        -------------------------------------
+        req: is _thisect from express request
+        -------------------------------------
+    */
+    _this.generatePaginationParams = req => {
+        return {
+            limit: req.query.limit,
+            page: req.query.page
+        };
     };
 
     return _this;
@@ -193,21 +290,6 @@ function attachRetrieve(_this) {
             data => _this.generateDone(data, res, success_cb),
             error => _this.generateErrors(errors, res, failed_cb)
         );
-    };
-
-    /*
-        author: Ade Pangestu (adepanges@gmail.com)
-        -------------------------------------
-        method generatePaginationParams: to generate params pagination send from req.query 
-        -------------------------------------
-        req: is _thisect from express request
-        -------------------------------------
-    */
-    _this.generatePaginationParams = req => {
-        return {
-            limit: req.query.limit,
-            page: req.query.page
-        };
     };
 
     /*
@@ -346,7 +428,8 @@ function baseRepository(modelInstance, modelName) {
     var _this = {
         DB: '',
         modelName: '',
-        model: ''
+        model: '',
+        availableAttributes: []
     };
 
     switch (modelInstance) {
@@ -362,6 +445,7 @@ function baseRepository(modelInstance, modelName) {
             break;
     }
 
+    _this = attachProcessParams(_this);
     _this = attachRetrieve(_this);
     _this = attachCreateUpdateDelete(_this);
     _this = attachProcessMessagesSequelize(_this);

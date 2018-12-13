@@ -1,10 +1,10 @@
 const requestMiddleware = require('./../middleware/request');
 const errorMiddleware = require('./../middleware/error');
-const routeLoader = require('./load');
 
 module.exports = app => {
     requestMiddleware(app);
-    routeLoader(app);
+
+    app.use('/v1', require('./v1'));
 
     app.get('/', (req, res) =>
         res.app.emit('response', res, {
@@ -23,6 +23,13 @@ module.exports = app => {
 
         res.app.emit('response', res, {
             endpoints
+        });
+    });
+
+    app.use('*', function(req, res) {
+        res.app.emit('response', res, {
+            code: 404,
+            messages: 'Not found'
         });
     });
 

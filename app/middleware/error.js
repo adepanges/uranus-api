@@ -3,7 +3,8 @@ module.exports = app => {
         const { start, httpStatus, message, previousError, stack } = err;
         res.app.emit('response', res, {
             code: httpStatus || 503,
-            messages: message
+            messages: message,
+            stack
         });
     });
 };
